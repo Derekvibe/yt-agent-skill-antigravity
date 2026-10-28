@@ -49,3 +49,20 @@ framing, the three words, and what the background has to do to hold contrast at 
 
 Nothing here publishes. This skill writes and you publish. Every output ends in a block the user
 copies, and the last line of every run is the question: **ship it, or change it?**
+
+## Save to the video pack
+
+When the result is final, save it so the user gets one file per video instead of only a chat reply.
+Show the result in chat as usual, then save the chosen title and thumbnail pairing with the lint result. Save it as the `package` section.
+
+1. Use the video's name (reuse the name already used in this conversation, otherwise the working title). The pack lives in the `videos` folder at the root of the user's open workspace.
+2. Write the section text to a temporary file with your file tool, then run this from this skill's
+   folder (use `python` if `python3` is not found):
+
+```bash
+python3 ../yt-pack/pack.py add --root "<workspace>/videos" --video "<video name>" --section package --file "<temp file>" --delete-source
+```
+
+3. End your reply with the file path the command prints. If the command refuses the folder, ask the
+   user for their project folder. Never save inside the skills folder.
+

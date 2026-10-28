@@ -15,5 +15,6 @@ Copy-Item -Recurse -Force (Join-Path $here "skills\yt-*") $dest
 Get-ChildItem -Path $dest -Recurse -Directory -Filter __pycache__ | Remove-Item -Recurse -Force
 $v = Join-Path $voice "voice.md"
 if (-not (Test-Path $v)) { Copy-Item (Join-Path $here "templates\voice.md") $v }
-Write-Host "Installed 11 skills to $dest"
+$n = (Get-ChildItem (Join-Path $here "skills") -Directory -Filter "yt-*").Count
+Write-Host "Installed $n skills to $dest"
 Write-Host "Fill in your voice profile: $v"

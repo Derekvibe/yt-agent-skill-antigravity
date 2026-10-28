@@ -16,5 +16,5 @@ mkdir -p "$DEST" "$VOICE"
 cp -r "$HERE"/skills/yt-* "$DEST"/
 find "$DEST" -name __pycache__ -type d -prune -exec rm -rf {} + 2>/dev/null || true
 [ -f "$VOICE/voice.md" ] || cp "$HERE/templates/voice.md" "$VOICE/voice.md"
-echo "Installed 11 skills to $DEST"
+echo "Installed $(ls -d "$HERE"/skills/yt-* | wc -l | tr -d " ") skills to $DEST"
 echo "Fill in your voice profile: $VOICE/voice.md"

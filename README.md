@@ -3,7 +3,7 @@
 [![test](https://github.com/Derekvibe/yt-agent-skill-antigravity/actions/workflows/test.yml/badge.svg)](https://github.com/Derekvibe/yt-agent-skill-antigravity/actions/workflows/test.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
  
-Eleven skills that help you run a YouTube channel, packaged for [Google Antigravity](https://antigravity.google).
+Twelve skills that help you run a YouTube channel, packaged for [Google Antigravity](https://antigravity.google).
 Free, MIT licensed, no signup, no API key, nothing to connect.
  
 One skill writes your script from 21 hook formulas and scores the hook before you film a take.
@@ -62,8 +62,8 @@ Antigravity skills are folders containing a `SKILL.md`. The installer copies the
 | This project only | `<workspace>/.agents/skills/` | `--workspace` / `-Workspace` |
 | Antigravity CLI | `~/.gemini/antigravity-cli/skills/` | `--cli` (bash only) |
  
-Keep all eleven `yt-*` folders side by side. `yt-chapters` and `yt-retention` import from `yt-edit`,
-and `yt-viral` reads the hook list in `yt-script`.
+Keep all twelve `yt-*` folders side by side. `yt-chapters` and `yt-retention` import from `yt-edit`,
+`yt-viral` reads the hook list in `yt-script`, and every skill saves through `yt-pack`.
  
 ## Your voice file
  
@@ -77,7 +77,7 @@ Fill it in, or paste three of your own transcripts into the agent chat and say
 
 By default the skills will not invent figures. If you want round example amounts, say so in `voice.md` and they will label them as estimates.
  
-## The eleven skills
+## The twelve skills
  
 | Skill | What it does | Try saying |
 | --- | --- | --- |
@@ -92,7 +92,29 @@ By default the skills will not invent figures. If you want round example amounts
 | `yt-seo` | Description, tags worth having, and the three queries this should win. | "Write the description and tags" |
 | `yt-chapters` | Chapters from a transcript, validated against YouTube's own rules. | "Make chapters from this transcript" |
 | `yt-audit` | The whole channel, ending in ONE fix. | "Audit my channel" |
- 
+| `yt-pack` | One living file per video that every skill saves into. | "Show my video pack" |
+
+## Video packs: one file per video
+
+You do not have to dig results out of the chat. When a skill finishes, it saves its result into a
+single Markdown file for that video, in a `videos` folder at the root of your project:
+
+```
+videos/
+  index.md                        every video, its sections, when it last changed
+  i-tracked-every-naira/
+    video-pack.md                 idea, hooks, script, title and thumbnail, SEO, chapters, edit list...
+```
+
+Run `yt-script`, then `yt-package`, `yt-seo`, `yt-chapters` and the rest on the same video and they all
+add to the same file, in a fixed order. Run a skill again and only its section is replaced. Anything
+you type outside the marked blocks is kept. Channel-level work (`yt-audit`, `yt-plan`, `yt-viral`)
+goes into a pack named `channel`.
+
+Ask "show my video pack for X" at any time. Packs are plain Markdown, so they open in any editor,
+and you may want to add `videos/` to your `.gitignore`. The agent saves them through
+`skills/yt-pack/pack.py`, which refuses to write inside the skills folder.
+
 ## The six tools
  
 Plain Python, standard library only. The agent runs them for you, and you can run them yourself
@@ -125,8 +147,9 @@ Transcripts can be SRT, VTT or Whisper JSON. Accented text and files with a BOM 
 python tests/smoke_test.py
 ```
  
-13 checks cover skill frontmatter, all six tools, SRT / VTT / Whisper input, accented text under a
-non-UTF-8 locale, bad-input exit codes, and the cross-skill imports from an installed layout.
+20 checks cover skill frontmatter, all six tools, SRT / VTT / Whisper input, accented text under a
+non-UTF-8 locale, bad-input exit codes, the cross-skill imports from an installed layout, and the video
+pack (ordering, replace-on-rerun, notes preserved, path safety, stdin).
 GitHub Actions runs them on Linux, Windows and macOS. `pyflakes` is clean.
  
 Checked by hand: the tests on Windows with Python 3.13, `install.ps1` on Windows, `install.sh` on Linux.
@@ -142,6 +165,7 @@ Antigravity version and what the agent said.
 - `hookscore.py` exits non-zero on a bad path or a bare `--hook`.
 - `SKILL.md` files say where to run the tools from.
 - Lint clean, tests and CI added.
+- New `yt-pack` skill and `pack.py`: every skill now saves its result into one file per video.
 ## The fine print
  
 - **It does not publish.** Every skill ends in a block you copy.

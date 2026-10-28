@@ -7,7 +7,7 @@ tools do not depend on the current directory. The skills are copied to a temp fo
 way the installer lays them out, which proves the cross-skill imports (yt-chapters -> yt-edit,
 yt-viral -> yt-script/hooks.json) survive installation.
 """
-import glob, json, os, re, shutil, subprocess, sys, tempfile, unittest
+import glob, importlib.util, json, os, re, shutil, subprocess, sys, tempfile, unittest
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SKILLS_SRC = os.path.join(ROOT, "skills")
@@ -54,7 +54,7 @@ class Base(unittest.TestCase):
 class TestPackaging(Base):
     def test_eleven_skills_with_valid_frontmatter(self):
         files = sorted(glob.glob(os.path.join(SKILLS_SRC, "*", "SKILL.md")))
-        self.assertEqual(len(files), 11)
+        self.assertEqual(len(files), 12)
         for f in files:
             with open(f, encoding="utf-8") as fh:
                 text = fh.read()
@@ -64,6 +64,21 @@ class TestPackaging(Base):
             self.assertTrue(name, f + ": missing name")
             self.assertEqual(name.group(1).strip(), os.path.basename(os.path.dirname(f)))
             self.assertIn("description:", m.group(1))
+
+    def test_every_skill_saves_to_the_pack_with_valid_sections(self):
+        spec = importlib.util.spec_from_file_location("pack", os.path.join(SKILLS_SRC, "yt-pack", "pack.py"))
+        pack = importlib.util.module_from_spec(spec); spec.loader.exec_module(pack)
+        for f in glob.glob(os.path.join(SKILLS_SRC, "*", "SKILL.md")):
+            skill = os.path.basename(os.path.dirname(f))
+            if skill == "yt-pack":
+                continue
+            with open(f, encoding="utf-8") as fh:
+                text = fh.read()
+            self.assertIn("## Save to the video pack", text, skill)
+            sections = re.findall(r"pack\.py add .*?--section (\w+)", text)
+            self.assertTrue(sections, skill)
+            for s in sections:
+                self.assertIn(s, pack.ORDER, skill)
 
     def test_hooks_json(self):
         with open(os.path.join(SKILLS_SRC, "yt-script", "hooks.json"), encoding="utf-8") as fh:
@@ -139,6 +154,66 @@ class TestTools(Base):
                                    ("yt-chapters", "chapters.py", "nope.srt"), ("yt-retention", "retention.py", "nope.csv"),
                                    ("yt-viral", "swipe.py", "nope.json")]:
             self.assertEqual(self.tool(skill, script, arg)[0], 1, script)
+
+
+class TestPack(Base):
+    def pack(self, *args, **kw):
+        return self.tool("yt-pack", "pack.py", *args, **kw)
+
+    def setUp(self):
+        self.root = os.path.join(self.work, "videos")
+        shutil.rmtree(self.root, ignore_errors=True)
+
+    def add(self, video, section, text):
+        f = self.write("section.md", text)
+        return self.pack("add", "--root", self.root, "--video", video, "--section", section, "--file", f, "--delete-source")
+
+    def read_pack(self, slug):
+        with open(os.path.join(self.root, slug, "video-pack.md"), encoding="utf-8") as fh:
+            return fh.read()
+
+    def test_add_orders_sections_and_builds_index(self):
+        self.assertEqual(self.add("My Video", "script", "SCRIPT TEXT")[0], 0)
+        self.assertEqual(self.add("My Video", "hooks", "HOOK TEXT")[0], 0)
+        text = self.read_pack("my-video")
+        self.assertLess(text.index("HOOK TEXT"), text.index("SCRIPT TEXT"))  # fixed order
+        with open(os.path.join(self.root, "index.md"), encoding="utf-8") as fh:
+            self.assertIn("hooks, script", fh.read())
+        self.assertFalse(os.path.exists(os.path.join(self.work, "section.md")))  # --delete-source
+
+    def test_rerun_replaces_and_keeps_user_notes(self):
+        self.add("My Video", "script", "FIRST")
+        path = os.path.join(self.root, "my-video", "video-pack.md")
+        with open(path, "a", encoding="utf-8") as fh:
+            fh.write("MY OWN NOTE\n")
+        self.add("My Video", "script", "SECOND")
+        text = self.read_pack("my-video")
+        self.assertIn("SECOND", text); self.assertNotIn("FIRST", text)
+        self.assertEqual(text.count("yt:begin script"), 1)
+        self.assertIn("MY OWN NOTE", text)
+
+    def test_accents_slug_and_path_traversal(self):
+        self.assertEqual(self.add("Ọmọ Naijá: 30 days", "idea", "x")[0], 0)
+        self.assertTrue(os.path.isfile(os.path.join(self.root, "omo-naija-30-days", "video-pack.md")))
+        self.assertEqual(self.add("../../evil", "idea", "x")[0], 0)
+        self.assertTrue(os.path.isfile(os.path.join(self.root, "evil", "video-pack.md")))
+        self.assertFalse(os.path.exists(os.path.join(self.work, "..", "evil")))
+
+    def test_bad_input_is_refused(self):
+        self.assertEqual(self.add("V", "nonsense", "x")[0], 1)
+        self.assertEqual(self.add("V", "script", "   ")[0], 1)
+        rc, out = self.pack("add", "--root", self.skills, "--video", "V", "--section", "idea", "--text", "x")
+        self.assertEqual(rc, 1); self.assertIn("refusing", out)  # never write into the skills folder
+
+    def test_stdin_show_and_list(self):
+        script = os.path.join(self.skills, "yt-pack", "pack.py")
+        p = subprocess.run([sys.executable, script, "add", "--root", self.root, "--video", "Piped", "--section", "notes", "--stdin"],
+                           input="Ọmọ from stdin".encode("utf-8"), capture_output=True)
+        self.assertEqual(p.returncode, 0, p.stderr)
+        rc, out = self.pack("show", "--root", self.root, "--video", "Piped")
+        self.assertEqual(rc, 0); self.assertIn("from stdin", out)
+        rc, out = self.pack("list", "--root", self.root)
+        self.assertIn("piped", out)
 
 
 if __name__ == "__main__":
