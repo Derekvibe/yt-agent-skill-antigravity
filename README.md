@@ -74,6 +74,8 @@ Six of the skills read a voice profile so the output sounds like you. The instal
 - one project: `<workspace>/.agents/youtube/voice.md`
 Fill it in, or paste three of your own transcripts into the agent chat and say
 "write my voice.md from these".
+
+By default the skills will not invent figures. If you want round example amounts, say so in `voice.md` and they will label them as estimates.
  
 ## The eleven skills
  

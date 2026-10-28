@@ -19,7 +19,7 @@ For a video aimed at the subscriber feed, say so and spend the effort on `/yt-pa
    and write the file. A script in the wrong voice is worse than no script, because they have to
    read it out loud.
 2. Never invent a number, a result or a source. If a figure would strengthen it and you do not have
-   one, ask for it or write the line without it.
+   one, ask for it or write the line without it. That includes prices, percentages, savings amounts, bank or product names and "studies show" claims. Exception: if voice.md says illustrative estimates are allowed, round example amounts are fine when labelled as examples or estimates ("say, around $200"), but never present a made-up figure as the creator's own result, a real statistic or a sourced fact.
 
 ## The description
 
