@@ -1,6 +1,6 @@
 # YouTube Agent Skills for Google Antigravity
  
-[![test](https://github.com/Derekvibe/youtube-agent-skill-antigravity/actions/workflows/test.yml/badge.svg)](https://github.com/Derekvibe/youtube-agent-skill-antigravity/actions/workflows/test.yml)
+[![test](https://github.com/Derekvibe/yt-agent-skill-antigravity/actions/workflows/test.yml/badge.svg)](https://github.com/Derekvibe/yt-agent-skill-antigravity/actions/workflows/test.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
  
 Eleven skills that help you run a YouTube channel, packaged for [Google Antigravity](https://antigravity.google).
@@ -14,7 +14,8 @@ channel's median.
  
 **Nothing gets published for you.** These skills write and analyse. You upload.
  
-> **Credit.** This is an Antigravity port of
+> **Ported and maintained by [Derek (@Derekvibe)](https://github.com/Derekvibe).**
+> This is an Antigravity port of
 > [Jakeschincariol/youtube-agent-skill](https://github.com/Jakeschincariol/youtube-agent-skill) by
 > Jake Schincariol (MIT). The skills and the six Python tools are his. This repo changes the install
 > locations, the `voice.md` path and the docs, adds Windows-safe text handling, tests and CI.
@@ -25,8 +26,8 @@ channel's median.
 You need Antigravity and Python 3.6+ (3.9+ recommended).
  
 ```bash
-git clone https://github.com/Derekvibe/youtube-agent-skill-antigravity.git
-cd youtube-agent-skill-antigravity
+git clone https://github.com/Derekvibe/yt-agent-skill-antigravity.git
+cd yt-agent-skill-antigravity
 ```
  
 **Windows (PowerShell)**
@@ -128,7 +129,7 @@ GitHub Actions runs them on Linux, Windows and macOS. `pyflakes` is clean.
  
 Checked by hand: the tests on Windows with Python 3.13, `install.ps1` on Windows, `install.sh` on Linux.
 Skill discovery inside Antigravity depends on your Antigravity version. If it does not work for you,
-please [open an issue](https://github.com/Derekvibe/youtube-agent-skill-antigravity/issues) with your
+please [open an issue](https://github.com/Derekvibe/yt-agent-skill-antigravity/issues) with your
 Antigravity version and what the agent said.
  
 ## Changes from upstream
@@ -145,6 +146,15 @@ Antigravity version and what the agent said.
 - **`hookscore.py` is a heuristic, not a predictor.** Low score: look again. High score: not a promise.
 - **`yt-viral` reads, it does not scrape.** Public listings only, never your logged-in session.
 - **Nothing invents a number.** Missing figure: it asks, or writes the line without it.
+## Author and maintainer
+ 
+Antigravity port created and maintained by **Derek** ([@Derekvibe](https://github.com/Derekvibe)).
+Questions, bugs and pull requests are welcome through
+[GitHub issues](https://github.com/Derekvibe/yt-agent-skill-antigravity/issues).
+ 
+Original skills and Python tools by [Jake Schincariol](https://github.com/Jakeschincariol).
+ 
 ## License
  
-MIT. Original copyright Jake Schincariol; see [LICENSE](LICENSE).
+MIT. Copyright Jake Schincariol (original work) and Derekvibe (Antigravity port); see [LICENSE](LICENSE).
+ 
